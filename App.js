@@ -1,7 +1,21 @@
-import { KeyboardAvoidingView, StyleSheet, Text, View, TextInput, Platform, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { KeyboardAvoidingView, StyleSheet, Text, View, TextInput, Platform, Pressable, Keyboard } from 'react-native';
 import { Task } from './components/Task';
 
 export default function App() {
+  const [task, setTask] = useState();
+  const [taskItems, setTaskItems] = useState([]);
+
+  const handleAddTask = () => {
+    Keyboard.dismiss();
+    if (task && task.trim() !== '') {
+      setTaskItems([...taskItems, task]);
+      setTask(null);
+    } else {
+      alert('Please enter a valid task');
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.tasksWrapper}>
@@ -9,23 +23,31 @@ export default function App() {
       </View>
 
       <View style={styles.items}>
-        <Task text={'Task 1'} />
-        <Task text={'Task 2'} />
-        <Task text={'Task 3'} />
-        <Task text={'Task 4'} />
+        {taskItems.map((item, index) => {
+          return (
+            <Task key={index} text={item} />
+          )
+        })}
       </View>
 
-      <View style={styles.masterWrapper}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} styles={styles.writeTaskWrapper}>
-          <TextInput style={styles.input} placeholder={'Write a task'} />
-        </KeyboardAvoidingView>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.writeTaskWrapper}
+        keyboardVerticalOffset={90}
+      >
+        <TextInput
+          style={styles.input}
+          placeholder={'Write a task'}
+          value={task}
+          onChangeText={text => setTask(text)}
+        />
 
-        <Pressable>
+        <Pressable onPress={() => handleAddTask()}>
           <View style={styles.addWrapper}>
             <Text style={styles.addText}>+</Text>
           </View>
         </Pressable>
-      </View>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -33,7 +55,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#e5e7ea',
   },
 
   tasksWrapper: {
@@ -50,27 +72,19 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
 
-  masterWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 5,
-    width: '100%',
-    bottom: 0,
-  },
-
   writeTaskWrapper: {
     position: 'absolute',
     bottom: 60,
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
 
   input: {
-    paddingVertical: 5,
-    paddingHorizontal: 5,
+    paddingVertical: 15,
+    paddingHorizontal: 15,
     backgroundColor: '#FFF',
     borderRadius: 60,
     borderColor: '#C0C0C0',
@@ -87,5 +101,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: '#C0C0C0',
     borderWidth: 1,
+  },
+
+  addText: {
+    fontSize: 24,
+    color: '#C0C0C0',
   },
 });
